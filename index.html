@@ -84,6 +84,13 @@ body {
   box-shadow: 0 0 16px 4px currentColor;
   transform: scale(1.06);
 }
+#footer {
+  margin-top: 20px;
+  padding: 12px 0;
+  font-size: 14px;
+  color: #aaa;
+  text-align: center;
+}
 </style>
 </head>
 <body>
@@ -235,9 +242,14 @@ fetch("colors.json")
   .catch(err => console.warn("colors.json not loaded (ok for local testing):", err));
 
 </script>
-
+<!-- ===== Footer ===== -->
+<div id="footer">
+  Made with ❤️ by Sean for Kingdom
+</div>
+  
 </body>
 </html>
+
 
 
 
