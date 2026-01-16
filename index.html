@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>6x6 Team Board</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #121212;
+  color: white;
+  text-align: center;
+}
+#banner { width: 100%; height: auto; display: block; margin-bottom: 12px; }
+
+/* ===== Legend Panel ===== */
+#legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px;
+  flex-wrap: wrap;
+}
+.team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: #1b1b1b;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.team:hover { transform: scale(1.05); box-shadow: 0 0 10px rgba(255,255,255,0.15); }
+.team.selected { border-color: white; box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+.swatch { width: 18px; height: 18px; border-radius: 4px; }
+
+/* ===== Board ===== */
+#board {
+  display: grid;
+  grid-template-columns: repeat(6, 120px);
+  gap: 12px;
+  padding: 20px;
+  justify-content: center;
+  margin: 0 auto;
+}
+.card {
+  perspective: 800px;
+  cursor: pointer;
+  width: 120px;
+  height: 96px;
+  border-radius: 6px;
+  position: relative;
+}
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.4s;
+}
+.card.flipped .card-inner { transform: rotateY(180deg); }
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  padding: 6px;
+  text-align: center;
+  font-weight: bold;
+}
+.card-front img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
+.card-back { transform: rotateY(180deg); color: white; }
+.card.highlight { box-shadow: 0 0 16px 4px currentColor; }
+</style>
+</head>
+<body>
+
+<img id="banner" src="banner.jpg" alt="Banner Image" />
+
+<!-- ===== Legend ===== -->
+<div id="legend"></div>
+
+<!-- ===== Board ===== -->
+<div id="board"></div>
+
+<script>
+// ============================
+// Teams & colors
+// ============================
+const teams = [
+  { name: "Six Seven Snipers", color: "#178C51", icon: "icons/sniper.png" },
+  { name: "Golden Goopers", color: "#F7E26D", icon: "icons/gooper.png" },
+  { name: "WAP", color: "#6887CE", icon: "icons/water.png" }
+];
+
+// ============================
+// Editable tile text
+// ============================
+const cardsData = [];
+for (let i=1; i<=36; i++){
+  cardsData.push({
+    image: `images/card${i}.png`,
+    text: `Tile ${i} Text` // <-- Edit tile back text here
+  });
+}
+
+// ============================
+// Build legend
+// ============================
+const legend = document.getElementById("legend");
+let selectedTeam = null;
+
+teams.forEach(team => {
+  const teamEl = document.createElement("div");
+  teamEl.className = "team";
+  teamEl.innerHTML = `
+    <div class="swatch" style="background:${team.color}"></div>
+    <img src="${team.icon}" width="20" height="20">
+    <span>${team.name}</span>
+  `;
+  teamEl.addEventListener("click", () => {
+    // Toggle selection
+    if (selectedTeam === team) {
+      selectedTeam = null;
+      teamEl.classList.remove("selected");
+      clearHighlights();
+    } else {
+      document.querySelectorAll(".team").forEach(t => t.classList.remove("selected"));
+      teamEl.classList.add("selected");
+      selectedTeam = team;
+      highlightTeamTiles(team.color);
+    }
+  });
+  legend.appendChild(teamEl);
+});
+
+// Highlight tiles that match the selected team color
+function highlightTeamTiles(color){
+  document.querySelectorAll(".card").forEach(card => {
+    card.classList.toggle("highlight", card.dataset.color === color);
+  });
+}
+function clearHighlights(){
+  document.querySelectorAll(".card").forEach(card => card.classList.remove("highlight"));
+}
+
+// ============================
+// Build board
+// ============================
+const board = document.getElementById("board");
+
+cardsData.forEach((cardData, index)=>{
+  const card = document.createElement("div");
+  card.className="card";
+  card.dataset.index=index;
+
+  card.innerHTML = `<div class="card-inner">
+    <div class="card-face card-front" style="background:#121212"><img src="${cardData.image}" alt=""></div>
+    <div class="card-face card-back" style="background:#121212; color:white">${cardData.text}</div>
+  </div>`;
+
+  const backFace = card.querySelector(".card-back");
+
+  // Flip on click
+  card.addEventListener("click", ()=>card.classList.toggle("flipped"));
+
+  board.appendChild(card);
+});
+
+// ============================
+// Load colors from JSON
+// ============================
+// Example colors.json:
+// [
+//   { "id": 1, "color": "#178C51" },
+//   { "id": 2, "color": "#F7E26D" },
+//   { "id": 3, "color": "#6887CE" }
+// ]
+fetch("colors.json")
+  .then(res => {
+    if (!res.ok) throw new Error("Failed to load colors.json");
+    return res.json();
+  })
+  .then(data => {
+    data.forEach(tile => {
+      const card = board.children[tile.id-1];
+      const color = tile.color;
+      card.dataset.color = color;
+      card.querySelectorAll(".card-face").forEach(face => face.style.background = color || "#121212");
+      card.querySelector(".card-back").style.color = color ? "black" : "white";
+    });
+  })
+  .catch(err => console.warn("colors.json not loaded (ok for local testing):", err));
+</script>
+
+</body>
+</html>
