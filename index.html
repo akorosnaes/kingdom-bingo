@@ -52,7 +52,9 @@ body {
   height: 96px;
   border-radius: 6px;
   position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease; /* smooth hover/selection */
 }
+.card:hover { transform: scale(1.05); box-shadow: 0 0 12px rgba(0,200,255,0.4); }
 .card-inner {
   position: relative;
   width: 100%;
@@ -76,7 +78,12 @@ body {
 }
 .card-front img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
 .card-back { transform: rotateY(180deg); color: white; }
-.card.highlight { box-shadow: 0 0 16px 4px currentColor; }
+
+/* Highlighted when team is selected */
+.card.highlight {
+  box-shadow: 0 0 16px 4px currentColor;
+  transform: scale(1.06);
+}
 </style>
 </head>
 <body>
@@ -143,7 +150,11 @@ teams.forEach(team => {
 // Highlight tiles that match the selected team color
 function highlightTeamTiles(color){
   document.querySelectorAll(".card").forEach(card => {
-    card.classList.toggle("highlight", card.dataset.color === color);
+    if(card.dataset.color === color){
+      card.classList.add("highlight");
+    } else {
+      card.classList.remove("highlight");
+    }
   });
 }
 function clearHighlights(){
@@ -176,12 +187,6 @@ cardsData.forEach((cardData, index)=>{
 // ============================
 // Load colors from JSON
 // ============================
-// Example colors.json:
-// [
-//   { "id": 1, "color": "#178C51" },
-//   { "id": 2, "color": "#F7E26D" },
-//   { "id": 3, "color": "#6887CE" }
-// ]
 fetch("colors.json")
   .then(res => {
     if (!res.ok) throw new Error("Failed to load colors.json");
@@ -193,10 +198,11 @@ fetch("colors.json")
       const color = tile.color;
       card.dataset.color = color;
       card.querySelectorAll(".card-face").forEach(face => face.style.background = color || "#121212");
-      card.querySelector(".card-back").style.color = color ? "black" : "white";
+      card.querySelector(".card-back").style.color = color?"black":"white";
     });
   })
   .catch(err => console.warn("colors.json not loaded (ok for local testing):", err));
+
 </script>
 
 </body>
