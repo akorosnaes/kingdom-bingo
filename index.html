@@ -13,7 +13,6 @@
   letter-spacing: 0.5px;
 }
 
-  
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -96,6 +95,29 @@ body {
   box-shadow: 0 0 16px 4px currentColor;
   transform: scale(1.06);
 }
+
+/* ===== Leaderboard ===== */
+#leaderboard {
+  margin-top: 20px;
+  padding: 12px;
+  background: #121212; /* same as body */
+  display: inline-block;
+  border-radius: 6px;
+  text-align: center;  /* center the text */
+}
+#scores div {
+  margin: 4px 0;
+  font-weight: bold;
+}
+#scores span.team-name {
+  font-weight: bold;
+}
+#scores span.points {
+  font-weight: normal;
+  color: white;
+  margin-left: 4px;
+}
+
 #footer {
   margin-top: 20px;
   padding: 12px 0;
@@ -117,6 +139,12 @@ body {
 <!-- ===== Board ===== -->
 <div id="board"></div>
 
+<!-- ===== Leaderboard ===== -->
+<div id="leaderboard">
+  <h3>Leaderboard</h3>
+  <div id="scores"></div>
+</div>
+
 <script>
 // ============================
 // Teams & colors
@@ -131,12 +159,12 @@ const teams = [
 // Editable tile text
 // ============================
 const cardsData = [
-  { image: "images/card1.png", text: "Huberte [18]" },   // Tile 1
-  { image: "images/card2.png", text: "Avernic defender hilt (Trios - Reg) [21]" },     // Tile 2
-  { image: "images/card3.png", text: "Ring of the gods (Vet'ion Only) [21]" },      // Tile 3
-  { image: "images/card4.png", text: "2x Dragon pickaxe [22]" },      // Tile 4
-  { image: "images/card5.png", text: "6x Venator shard [22]" },      // Tile 5
-  { image: "images/card6.png", text: "Jar of miasma [23]" },      // Tile 6
+  { image: "images/card1.png", text: "Huberte [18]" },  
+  { image: "images/card2.png", text: "Avernic defender hilt (Trios - Reg) [21]" }, 
+  { image: "images/card3.png", text: "Ring of the gods (Vet'ion Only) [21]" }, 
+  { image: "images/card4.png", text: "2x Dragon pickaxe [22]" },
+  { image: "images/card5.png", text: "6x Venator shard [22]" },
+  { image: "images/card6.png", text: "Jar of miasma [23]" },
   { image: "images/card7.png", text: "2x Hydra's claw OR Hydra leather [23]" },
   { image: "images/card8.png", text: "2x Fangs of venenatis (Spindel only) [25]" },
   { image: "images/card9.png", text: "Complete Barrows set [25]" },
@@ -156,7 +184,7 @@ const cardsData = [
   { image: "images/card23.png", text: "2x Armadyl crossbow [34]" },
   { image: "images/card24.png", text: "2x Osmumten's fang or Elidninis' ward (3+ Scale) [34]" },
   { image: "images/card25.png", text: "2x Any Unique, No Pet [34]" },
-  { image: "images/card26.png", text: "Two seperate drop tables, no pet (COX: Reg) [35]" },
+  { image: "images/card26.png", text: "Two separate drop tables, no pet (COX: Reg) [35]" },
   { image: "images/card27.png", text: "Jar of Venom [39]" },
   { image: "images/card28.png", text: "2x Non-Avernic, No Pet (4+ Scale - Reg) [41]" },
   { image: "images/card29.png", text: "2x Oathplate [42]" },
@@ -184,7 +212,6 @@ teams.forEach(team => {
     <span>${team.name}</span>
   `;
   teamEl.addEventListener("click", () => {
-    // Toggle selection
     if (selectedTeam === team) {
       selectedTeam = null;
       teamEl.classList.remove("selected");
@@ -199,7 +226,6 @@ teams.forEach(team => {
   legend.appendChild(teamEl);
 });
 
-// Highlight tiles that match the selected team color
 function highlightTeamTiles(color){
   document.querySelectorAll(".card").forEach(card => {
     if(card.dataset.color === color){
@@ -217,33 +243,70 @@ function clearHighlights(){
 // Build board
 // ============================
 const board = document.getElementById("board");
-
-cardsData.forEach((cardData, index)=>{
+cardsData.forEach((cardData,index)=>{
   const card = document.createElement("div");
   card.className="card";
   card.dataset.index=index;
-
   card.innerHTML = `<div class="card-inner">
     <div class="card-face card-front" style="background:#121212"><img src="${cardData.image}" alt=""></div>
     <div class="card-face card-back" style="background:#121212; color:white">${cardData.text}</div>
   </div>`;
-
-  const backFace = card.querySelector(".card-back");
-
-  // Flip on click
   card.addEventListener("click", ()=>card.classList.toggle("flipped"));
-
   board.appendChild(card);
 });
+
+// ============================
+// Leaderboard
+// ============================
+const scoresDiv = document.getElementById("scores");
+const scores = {};
+
+function getPoints(text){
+  const match = text.match(/\[(\d+)\]/);
+  return match ? parseInt(match[1]) : 0;
+}
+
+function updateLeaderboard(){
+  // reset scores
+  teams.forEach(team => scores[team.name]=0);
+
+  // iterate cards and sum points
+  document.querySelectorAll(".card").forEach(card=>{
+    const color = card.dataset.color;
+    if(!color) return;
+    const team = teams.find(t=>t.color===color);
+    if(!team) return;
+    const points = getPoints(card.querySelector(".card-back").textContent);
+    scores[team.name] += points;
+  });
+
+  // render leaderboard
+  scoresDiv.innerHTML="";
+  teams.forEach(team=>{
+    const div = document.createElement("div");
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = team.name;
+    nameSpan.className = "team-name";
+    nameSpan.style.color = team.color;
+
+    const pointsSpan = document.createElement("span");
+    pointsSpan.textContent = `: ${scores[team.name]} pts`;
+    pointsSpan.className = "points";
+
+    div.appendChild(nameSpan);
+    div.appendChild(pointsSpan);
+    scoresDiv.appendChild(div);
+  });
+}
+
+// Initialize leaderboard immediately
+updateLeaderboard();
 
 // ============================
 // Load colors from JSON
 // ============================
 fetch("colors.json")
-  .then(res => {
-    if (!res.ok) throw new Error("Failed to load colors.json");
-    return res.json();
-  })
+  .then(res => res.json())
   .then(data => {
     data.forEach(tile => {
       const card = board.children[tile.id-1];
@@ -252,6 +315,7 @@ fetch("colors.json")
       card.querySelectorAll(".card-face").forEach(face => face.style.background = color || "#121212");
       card.querySelector(".card-back").style.color = color?"black":"white";
     });
+    updateLeaderboard(); // update after colors.json loads
   })
   .catch(err => console.warn("colors.json not loaded (ok for local testing):", err));
 
@@ -259,39 +323,26 @@ fetch("colors.json")
 // Countdown Timer
 // ============================
 const countdownEl = document.getElementById("countdown");
-
-// Target: Thursday Jan 22 at 5pm local time
 const targetDate = new Date("January 22, 2026 17:00:00").getTime();
-
 function updateCountdown() {
   const now = new Date().getTime();
   const diff = targetDate - now;
-
-  if (diff <= 0) {
-    countdownEl.textContent = "Time's up!";
-    return;
-  }
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-  const seconds = Math.floor((diff / 1000) % 60);
-
-  countdownEl.textContent =
-    `⏳ ${days}d ${hours}h ${minutes}m ${seconds}s remaining until Bingo starts!`;
+  if(diff<=0){ countdownEl.textContent="Time's up!"; return; }
+  const days = Math.floor(diff/(1000*60*60*24));
+  const hours = Math.floor((diff/(1000*60*60))%24);
+  const minutes = Math.floor((diff/(1000*60))%60);
+  const seconds = Math.floor((diff/1000)%60);
+  countdownEl.textContent=`⏳ ${days}d ${hours}h ${minutes}m ${seconds}s remaining until Bingo starts!`;
 }
-
 updateCountdown();
-setInterval(updateCountdown, 1000);
+setInterval(updateCountdown,1000);
 
-  
-  
-  
 </script>
+
 <!-- ===== Footer ===== -->
 <div id="footer">
   Made with ❤️ by Sean for Kingdom
 </div>
-  
+
 </body>
 </html>
