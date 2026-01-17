@@ -1,19 +1,19 @@
 [
-  { "id": 1, "color": "" },
+  { "id": 1, "color": "#178C51" },
   { "id": 2, "color": "" },
   { "id": 3, "color": "" },
   { "id": 4, "color": "" },
   { "id": 5, "color": "" },
   { "id": 6, "color": "" },
 
-  { "id": 7, "color": "" },
+  { "id": 7, "color": "#6887CE" },
   { "id": 8, "color": "" },
   { "id": 9, "color": "" },
   { "id": 10, "color": "" },
   { "id": 11, "color": "" },
   { "id": 12, "color": "" },
 
-  { "id": 13, "color": "" },
+  { "id": 13, "color": "#F2AA24" },
   { "id": 14, "color": "" },
   { "id": 15, "color": "" },
   { "id": 16, "color": "" },
@@ -41,6 +41,7 @@
   { "id": 35, "color": "" },
   { "id": 36, "color": "" }
 ]
+
 
 
 
