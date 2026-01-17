@@ -88,6 +88,9 @@
     position: relative;
     box-sizing: border-box;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+    /* ✅ safe performance hint (doesn't fight flip) */
+    will-change: transform;
   }
 
   .card-inner {
@@ -132,9 +135,9 @@
     color: white;
   }
 
-  /* Hover glow (fix: z-index so glow never “disappears”) */
+  /* Hover glow (reduced scale to reduce blur) */
   .card:hover {
-    transform: scale(1.08);
+    transform: scale(1.05); /* ✅ was 1.08 */
     box-shadow: 0 0 18px rgba(0,200,255,0.35);
     z-index: 20;
   }
@@ -181,6 +184,14 @@
     font-size: 14px;
     color: #aaa;
     text-align: center;
+  }
+
+  #footer a {
+    color: #9ecbff;
+    text-decoration: none;
+  }
+  #footer a:hover {
+    text-decoration: underline;
   }
 </style>
 </head>
@@ -403,7 +414,10 @@
 </script>
 
 <div id="footer">
-  Made with ❤️ by Sean for Kingdom
+  Made with ❤️ by Sean for Kingdom<br>
+  <a href="https://discord.gg/kingdomclan" target="_blank" rel="noopener noreferrer">
+    discord.gg/kingdomclan
+  </a>
 </div>
 
 </body>
