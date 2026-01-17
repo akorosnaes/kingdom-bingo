@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Kingdom 2026 Bingo</title>
+<link rel="icon" href="favicon.ico">
 <style>
 
 #countdown {
@@ -13,7 +14,6 @@
   letter-spacing: 0.5px;
 }
 
-  
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -96,6 +96,7 @@ body {
   box-shadow: 0 0 16px 4px currentColor;
   transform: scale(1.06);
 }
+
 #footer {
   margin-top: 20px;
   padding: 12px 0;
@@ -103,6 +104,66 @@ body {
   color: #aaa;
   text-align: center;
 }
+
+/* ============================
+   ADMIN PANEL
+============================ */
+#adminOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+#adminPanel {
+  background: #1b1b1b;
+  border-radius: 10px;
+  padding: 20px;
+  width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 30px rgba(0,0,0,0.6);
+  text-align: left;
+}
+#adminPanel h2 {
+  margin-top: 0;
+  text-align: center;
+}
+.admin-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 70px;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.admin-row input {
+  background: #121212;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px 6px;
+}
+.admin-row button {
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.admin-row button:hover { background: #555; }
+#adminClose {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  background: #444;
+  color: white;
+  cursor: pointer;
+}
+#adminClose:hover { background: #666; }
+
 </style>
 </head>
 <body>
@@ -131,12 +192,12 @@ const teams = [
 // Editable tile text
 // ============================
 const cardsData = [
-  { image: "images/card1.png", text: "Huberte [18]" },   // Tile 1
-  { image: "images/card2.png", text: "Avernic defender hilt (Trios - Reg) [21]" },     // Tile 2
-  { image: "images/card3.png", text: "Ring of the gods (Vet'ion Only) [21]" },      // Tile 3
-  { image: "images/card4.png", text: "2x Dragon pickaxe [22]" },      // Tile 4
-  { image: "images/card5.png", text: "6x Venator shard [22]" },      // Tile 5
-  { image: "images/card6.png", text: "Jar of miasma [23]" },      // Tile 6
+  { image: "images/card1.png", text: "Huberte [18]" },
+  { image: "images/card2.png", text: "Avernic defender hilt (Trios - Reg) [21]" },
+  { image: "images/card3.png", text: "Ring of the gods (Vet'ion Only) [21]" },
+  { image: "images/card4.png", text: "2x Dragon pickaxe [22]" },
+  { image: "images/card5.png", text: "6x Venator shard [22]" },
+  { image: "images/card6.png", text: "Jar of miasma [23]" },
   { image: "images/card7.png", text: "2x Hydra's claw OR Hydra leather [23]" },
   { image: "images/card8.png", text: "2x Fangs of venenatis (Spindel only) [25]" },
   { image: "images/card9.png", text: "Complete Barrows set [25]" },
@@ -170,7 +231,7 @@ const cardsData = [
 ];
 
 // ============================
-// Build legend
+// Legend
 // ============================
 const legend = document.getElementById("legend");
 let selectedTeam = null;
@@ -184,7 +245,6 @@ teams.forEach(team => {
     <span>${team.name}</span>
   `;
   teamEl.addEventListener("click", () => {
-    // Toggle selection
     if (selectedTeam === team) {
       selectedTeam = null;
       teamEl.classList.remove("selected");
@@ -199,7 +259,6 @@ teams.forEach(team => {
   legend.appendChild(teamEl);
 });
 
-// Highlight tiles that match the selected team color
 function highlightTeamTiles(color){
   document.querySelectorAll(".card").forEach(card => {
     if(card.dataset.color === color){
@@ -228,39 +287,50 @@ cardsData.forEach((cardData, index)=>{
     <div class="card-face card-back" style="background:#121212; color:white">${cardData.text}</div>
   </div>`;
 
-  const backFace = card.querySelector(".card-back");
-
-  // Flip on click
   card.addEventListener("click", ()=>card.classList.toggle("flipped"));
-
   board.appendChild(card);
 });
 
 // ============================
-// Load colors from JSON
+// Persistent state (localStorage)
 // ============================
-fetch("colors.json")
-  .then(res => {
-    if (!res.ok) throw new Error("Failed to load colors.json");
-    return res.json();
-  })
-  .then(data => {
-    data.forEach(tile => {
-      const card = board.children[tile.id-1];
-      const color = tile.color;
-      card.dataset.color = color;
-      card.querySelectorAll(".card-face").forEach(face => face.style.background = color || "#121212");
-      card.querySelector(".card-back").style.color = color?"black":"white";
+const STORAGE_KEY = "kingdom-tile-state";
+
+function loadSavedState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return;
+  const state = JSON.parse(raw);
+  state.forEach((tile, i)=>{
+    const card = board.children[i];
+    if(!card) return;
+    if(tile.text){
+      card.querySelector(".card-back").textContent = tile.text;
+    }
+    if(tile.color){
+      card.dataset.color = tile.color;
+      card.querySelectorAll(".card-face").forEach(face => face.style.background = tile.color);
+      card.querySelector(".card-back").style.color = "black";
+    }
+  });
+}
+
+function saveState(){
+  const state = [];
+  document.querySelectorAll(".card").forEach(card=>{
+    state.push({
+      text: card.querySelector(".card-back").textContent,
+      color: card.dataset.color || ""
     });
-  })
-  .catch(err => console.warn("colors.json not loaded (ok for local testing):", err));
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+loadSavedState();
 
 // ============================
 // Countdown Timer
 // ============================
 const countdownEl = document.getElementById("countdown");
-
-// Target: Thursday Jan 22 at 5pm local time
 const targetDate = new Date("January 22, 2026 17:00:00").getTime();
 
 function updateCountdown() {
@@ -284,22 +354,93 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-  
-  
-  
+// ============================
+// ADMIN PANEL
+// ============================
+const ADMIN_PASSWORD = "kingdom123!"; // ← change this if you want
+
+const adminOverlay = document.createElement("div");
+adminOverlay.id = "adminOverlay";
+adminOverlay.innerHTML = `
+  <div id="adminPanel">
+    <h2>Admin Panel</h2>
+    <div id="adminRows"></div>
+    <button id="adminClose">Close</button>
+  </div>
+`;
+document.body.appendChild(adminOverlay);
+
+const adminRows = adminOverlay.querySelector("#adminRows");
+const adminClose = adminOverlay.querySelector("#adminClose");
+
+function buildAdminPanel(){
+  adminRows.innerHTML = "";
+  document.querySelectorAll(".card").forEach((card, i)=>{
+    const row = document.createElement("div");
+    row.className = "admin-row";
+    row.innerHTML = `
+      <input type="text" value="${card.querySelector('.card-back').textContent}">
+      <input type="text" placeholder="#RRGGBB" value="${card.dataset.color || ""}">
+      <button>Clear</button>
+    `;
+
+    const textInput = row.children[0];
+    const colorInput = row.children[1];
+    const clearBtn = row.children[2];
+
+    textInput.addEventListener("input", ()=>{
+      card.querySelector(".card-back").textContent = textInput.value;
+      saveState();
+    });
+
+    colorInput.addEventListener("input", ()=>{
+      const val = colorInput.value.trim();
+      if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(val)){
+        card.dataset.color = val;
+        card.querySelectorAll(".card-face").forEach(face => face.style.background = val);
+        card.querySelector(".card-back").style.color = "black";
+      }
+      saveState();
+      if(selectedTeam) highlightTeamTiles(selectedTeam.color);
+    });
+
+    clearBtn.addEventListener("click", ()=>{
+      delete card.dataset.color;
+      card.querySelectorAll(".card-face").forEach(face => face.style.background = "#121212");
+      card.querySelector(".card-back").style.color = "white";
+      colorInput.value = "";
+      saveState();
+      if(selectedTeam) highlightTeamTiles(selectedTeam.color);
+    });
+
+    adminRows.appendChild(row);
+  });
+}
+
+function openAdmin(){
+  const pass = prompt("Enter admin password:");
+  if(pass !== ADMIN_PASSWORD) return alert("Incorrect password.");
+  buildAdminPanel();
+  adminOverlay.style.display = "flex";
+}
+
+adminClose.addEventListener("click", ()=>{
+  adminOverlay.style.display = "none";
+});
+
+// Keyboard shortcut: press A
+document.addEventListener("keydown", e=>{
+  if(e.key.toLowerCase() === "a"){
+    openAdmin();
+  }
+});
+
 </script>
+
 <!-- ===== Footer ===== -->
 <div id="footer">
   Made with ❤️ by Sean for Kingdom
 </div>
-  
+
 </body>
 </html>
-
-
-
-
-
-
-
-
