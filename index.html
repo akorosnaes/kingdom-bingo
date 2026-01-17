@@ -4,181 +4,189 @@
 <meta charset="UTF-8">
 <title>Kingdom 2026 Bingo</title>
 <style>
+  #countdown {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 12px 0;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
 
-#countdown {
-  font-size: 20px;
-  font-weight: bold;
-  margin: 12px 0;
-  color: #fff;
-  letter-spacing: 0.5px;
-}
-  
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #121212;
-  color: white;
-  text-align: center;
-}
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: white;
+    text-align: center;
+  }
 
-/* ===== Banner ===== */
-#banner { width: 100%; height: auto; display: block; margin-bottom: 12px; }
+  /* ===== Banner ===== */
+  #banner {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 12px;
+  }
 
-/* ===== Main container ===== */
-#main-container {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
+  /* ===== Legend Panel ===== */
+  #legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px;
+    flex-wrap: wrap;
+  }
+  .team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: #1b1b1b;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  .team:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255,255,255,0.15);
+  }
+  .team.selected {
+    border-color: white;
+    box-shadow: 0 0 12px rgba(255,255,255,0.4);
+  }
+  .swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+  }
 
-/* ===== Board ===== */
-#board {
-  display: grid;
-  grid-template-columns: repeat(6, 120px);
-  gap: 12px;
-  padding: 20px;
-  justify-content: center;
-}
-.card {
-  perspective: 800px;
-  cursor: pointer;
-  width: 120px;
-  height: 96px;
-  border-radius: 6px;
-  position: relative;
-  box-sizing: border-box;   
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.4s;
-}
-.card.flipped .card-inner { transform: rotateY(180deg); }
+  /* ===== Main container ===== */
+  #main-container {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;          /* leaderboard drops underneath if needed */
+    align-items: flex-start;  /* top-align */
+    padding: 20px;
+  }
 
-.card-face {
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  backface-visibility: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  padding: 6px;
-  text-align: center;
-  font-weight: bold;
-  background: rgba(30,30,30,0.65);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.card-front img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
-.card-back {
-  transform: rotateY(180deg);
-  background: rgba(30,30,30,0.85); 
-  color: white;
-}
+  /* ===== Board ===== */
+  #board {
+    display: grid;
+    grid-template-columns: repeat(6, 120px); /* ALWAYS 6x6 */
+    gap: 12px;
+    justify-content: center;
+  }
 
-/* Highlighted when team is selected */
-.card.highlight {
-  box-shadow: 0 0 16px 4px currentColor;
-  transform: scale(1.06);
-}
+  .card {
+    perspective: 800px;
+    cursor: pointer;
+    width: 120px;
+    height: 96px;
+    border-radius: 6px;
+    position: relative;
+    box-sizing: border-box;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
 
-/* Hover effect for each tile */
-.card:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 18px rgba(0,200,255,0.35);
-}
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.4s;
+  }
 
-/* ===== Legend Panel ===== */
-#legend {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  padding: 12px;
-  flex-wrap: wrap;
-}
-.team {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  border: 2px solid transparent;
-  background: #1b1b1b;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-.team:hover { transform: scale(1.05); box-shadow: 0 0 10px rgba(255,255,255,0.15); }
-.team.selected { border-color: white; box-shadow: 0 0 12px rgba(255,255,255,0.4); }
-.swatch { width: 18px; height: 18px; border-radius: 4px; }
+  .card.flipped .card-inner { transform: rotateY(180deg); }
 
-/* ===== Leaderboard ===== */
-#leaderboard {
-  min-width: 200px;
-  background: rgba(30,30,30,0.8);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 8px;
-  padding: 12px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  height: fit-content;
-  align-items: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-#leaderboard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,200,255,0.2);
-}
-#leaderboard div {
-  width: 100%;
-  text-align: center;
-  font-weight: bold;
-}
+  .card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    padding: 6px;
+    text-align: center;
+    font-weight: bold;
+    background: rgba(30,30,30,0.65);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
 
-/* Subtle glow/pulse for highest scoring team */
-.pulse {
-  animation: pulseGlow 1.2s infinite alternate;
-}
-@keyframes pulseGlow {
-  from { text-shadow: 0 0 4px #fff; }
-  to { text-shadow: 0 0 12px #fff; }
-}
+  .card-front img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    pointer-events: none;
+  }
 
-/* ===== Footer ===== */
-#footer {
-  margin-top: 20px;
-  padding: 12px 0;
-  font-size: 14px;
-  color: #aaa;
-  text-align: center;
-}
+  .card-back {
+    transform: rotateY(180deg);
+    background: rgba(30,30,30,0.85);
+    color: white;
+  }
 
-/* ===== Responsive ===== */
-@media(max-width:1200px){
-  #main-container { flex-direction: column; align-items: center; }
-  #board { grid-template-columns: repeat(6, 100px); }
-}
-@media(max-width:800px){
-  #board { grid-template-columns: repeat(4, 90px); }
-}
-@media(max-width:500px){
-  #board { grid-template-columns: repeat(3, 80px); }
-}
+  /* Hover glow (fix: z-index so glow never “disappears”) */
+  .card:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 18px rgba(0,200,255,0.35);
+    z-index: 20;
+  }
+
+  /* Highlighted when team is selected */
+  .card.highlight {
+    box-shadow: 0 0 16px 4px currentColor;
+    transform: scale(1.06);
+    z-index: 10;
+  }
+
+  /* ===== Leaderboard ===== */
+  #leaderboard {
+    min-width: 200px;
+    background: rgba(30,30,30,0.8);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: fit-content;
+    align-items: center;
+    margin: 0;
+  }
+  #leaderboard div {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  /* Subtle glow/pulse for highest scoring team */
+  .pulse { animation: pulseGlow 1.2s infinite alternate; }
+  @keyframes pulseGlow {
+    from { text-shadow: 0 0 4px #fff; }
+    to { text-shadow: 0 0 12px #fff; }
+  }
+
+  /* ===== Footer ===== */
+  #footer {
+    margin-top: 20px;
+    padding: 12px 0;
+    font-size: 14px;
+    color: #aaa;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
 
 <img id="banner" src="banner.jpg" alt="Banner Image" />
-
 <div id="countdown"></div>
 
 <!-- ===== Legend ===== -->
@@ -191,181 +199,209 @@ body {
 </div>
 
 <script>
-// ============================
-// Teams & colors
-// ============================
-const teams = [
-  { name: "Six Seven Snipers", color: "#178C51", icon: "icons/sniper.png" },
-  { name: "Golden Goopers", color: "#F2AA24", icon: "icons/gooper.png" },
-  { name: "WAP", color: "#6887CE", icon: "icons/water.png" }
-];
+  // ============================
+  // Teams & colors
+  // ============================
+  const teams = [
+    { name: "Six Seven Snipers", color: "#178C51", icon: "icons/sniper.png" },
+    { name: "Golden Goopers", color: "#F2AA24", icon: "icons/gooper.png" },
+    { name: "WAP", color: "#6887CE", icon: "icons/water.png" }
+  ];
 
-// ============================
-// Original tile text
-// ============================
-const cardsData = [
-  { image: "images/card1.png", text: "Huberte [18]" },
-  { image: "images/card2.png", text: "Avernic defender hilt (Trios - Reg) [21]" },
-  { image: "images/card3.png", text: "Ring of the gods (Vet'ion Only) [21]" },
-  { image: "images/card4.png", text: "2x Dragon pickaxe [22]" },
-  { image: "images/card5.png", text: "6x Venator shard [22]" },
-  { image: "images/card6.png", text: "Jar of miasma [23]" },
-  { image: "images/card7.png", text: "2x Hydra's claw OR Hydra leather [23]" },
-  { image: "images/card8.png", text: "2x Fangs of venenatis (Spindel only) [25]" },
-  { image: "images/card9.png", text: "Complete Barrows set [25]" },
-  { image: "images/card10.png", text: "3x Any unique from Wave 12, no Echo crystal [26]" },
-  { image: "images/card11.png", text: "Leviathan's lure [28]" },
-  { image: "images/card12.png", text: "3x Primordial Crystal [29]" },
-  { image: "images/card13.png", text: "2x Black tourmaline core [29]" },
-  { image: "images/card14.png", text: "Executioner's axe head [30]" },
-  { image: "images/card15.png", text: "Jar of Eyes [30]" },
-  { image: "images/card16.png", text: "2x Kit or Dust (HMT) [31]" },
-  { image: "images/card17.png", text: "2x Staff of the dead [32]" },
-  { image: "images/card18.png", text: "2x Purple (Solo/Duo Scale) [32]" },
-  { image: "images/card19.png", text: "2x Bandos hilt [33]" },
-  { image: "images/card20.png", text: "3x Eye of ayak or Avernic treads [33]" },
-  { image: "images/card21.png", text: "2x Torva Piece or Ancient hilt [33]" },
-  { image: "images/card22.png", text: "2x Armadyl hilt [34]" },
-  { image: "images/card23.png", text: "2x Armadyl crossbow [34]" },
-  { image: "images/card24.png", text: "2x Osmumten's fang or Elidninis' ward (3+ Scale) [34]" },
-  { image: "images/card25.png", text: "2x Any Unique, No Pet [34]" },
-  { image: "images/card26.png", text: "Two separate drop tables, no pet (COX: Reg) [35]" },
-  { image: "images/card27.png", text: "Jar of Venom [39]" },
-  { image: "images/card28.png", text: "2x Non-Avernic, No Pet (4+ Scale - Reg) [41]" },
-  { image: "images/card29.png", text: "2x Oathplate [42]" },
-  { image: "images/card30.png", text: "Moxi [43]" },
-  { image: "images/card31.png", text: "Any Virtus piece from both bosses (Duke + Whisperer) [44]" },
-  { image: "images/card32.png", text: "3x Inquisitor, Orb, Pet or Jar (PNM) [46]" },
-  { image: "images/card33.png", text: "2x Twisted Kit or Dust (COX:CM) [47]" },
-  { image: "images/card34.png", text: "Scurry [50]" },
-  { image: "images/card35.png", text: "2x Mutagen, Pet or Jar [54]" },
-  { image: "images/card36.png", text: "Enhanced Crystal Weapon Seed [56]" }
-];
+  // ============================
+  // Original tile text
+  // ============================
+  const cardsData = [
+    { image: "images/card1.png", text: "Huberte [18]" },
+    { image: "images/card2.png", text: "Avernic defender hilt (Trios - Reg) [21]" },
+    { image: "images/card3.png", text: "Ring of the gods (Vet'ion Only) [21]" },
+    { image: "images/card4.png", text: "2x Dragon pickaxe [22]" },
+    { image: "images/card5.png", text: "6x Venator shard [22]" },
+    { image: "images/card6.png", text: "Jar of miasma [23]" },
+    { image: "images/card7.png", text: "2x Hydra's claw OR Hydra leather [23]" },
+    { image: "images/card8.png", text: "2x Fangs of venenatis (Spindel only) [25]" },
+    { image: "images/card9.png", text: "Complete Barrows set [25]" },
+    { image: "images/card10.png", text: "3x Any unique from Wave 12, no Echo crystal [26]" },
+    { image: "images/card11.png", text: "Leviathan's lure [28]" },
+    { image: "images/card12.png", text: "3x Primordial Crystal [29]" },
+    { image: "images/card13.png", text: "2x Black tourmaline core [29]" },
+    { image: "images/card14.png", text: "Executioner's axe head [30]" },
+    { image: "images/card15.png", text: "Jar of Eyes [30]" },
+    { image: "images/card16.png", text: "2x Kit or Dust (HMT) [31]" },
+    { image: "images/card17.png", text: "2x Staff of the dead [32]" },
+    { image: "images/card18.png", text: "2x Purple (Solo/Duo Scale) [32]" },
+    { image: "images/card19.png", text: "2x Bandos hilt [33]" },
+    { image: "images/card20.png", text: "3x Eye of ayak or Avernic treads [33]" },
+    { image: "images/card21.png", text: "2x Torva Piece or Ancient hilt [33]" },
+    { image: "images/card22.png", text: "2x Armadyl hilt [34]" },
+    { image: "images/card23.png", text: "2x Armadyl crossbow [34]" },
+    { image: "images/card24.png", text: "2x Osmumten's fang or Elidninis' ward (3+ Scale) [34]" },
+    { image: "images/card25.png", text: "2x Any Unique, No Pet [34]" },
+    { image: "images/card26.png", text: "Two separate drop tables, no pet (COX: Reg) [35]" },
+    { image: "images/card27.png", text: "Jar of Venom [39]" },
+    { image: "images/card28.png", text: "2x Non-Avernic, No Pet (4+ Scale - Reg) [41]" },
+    { image: "images/card29.png", text: "2x Oathplate [42]" },
+    { image: "images/card30.png", text: "Moxi [43]" },
+    { image: "images/card31.png", text: "Any Virtus piece from both bosses (Duke + Whisperer) [44]" },
+    { image: "images/card32.png", text: "3x Inquisitor, Orb, Pet or Jar (PNM) [46]" },
+    { image: "images/card33.png", text: "2x Twisted Kit or Dust (COX:CM) [47]" },
+    { image: "images/card34.png", text: "Scurry [50]" },
+    { image: "images/card35.png", text: "2x Mutagen, Pet or Jar [54]" },
+    { image: "images/card36.png", text: "Enhanced Crystal Weapon Seed [56]" }
+  ];
 
-// ============================
-// Build legend
-// ============================
-const legend=document.getElementById("legend");
-let selectedTeam=null;
-teams.forEach(team=>{
-  const teamEl=document.createElement("div");
-  teamEl.className="team";
-  teamEl.innerHTML=`
-    <div class="swatch" style="background:${team.color}"></div>
-    <img src="${team.icon}" width="20" height="20">
-    <span>${team.name}</span>
-  `;
-  teamEl.addEventListener("click",()=>{
-    if(selectedTeam===team){
-      selectedTeam=null;
-      teamEl.classList.remove("selected");
-      clearHighlights();
-    }else{
-      document.querySelectorAll(".team").forEach(t=>t.classList.remove("selected"));
-      teamEl.classList.add("selected");
-      selectedTeam=team;
-      highlightTeamTiles(team.color);
-    }
-  });
-  legend.appendChild(teamEl);
-});
+  // ============================
+  // Build legend
+  // ============================
+  const legend = document.getElementById("legend");
+  let selectedTeam = null;
 
-// ============================
-// Highlight tiles
-// ============================
-function highlightTeamTiles(color){
-  document.querySelectorAll(".card").forEach(card=>{
-    if(card.dataset.color===color){ card.classList.add("highlight"); }
-    else { card.classList.remove("highlight"); }
-  });
-}
-function clearHighlights(){ document.querySelectorAll(".card").forEach(card=>card.classList.remove("highlight")); }
-
-// ============================
-// Build board
-// ============================
-const board=document.getElementById("board");
-cardsData.forEach((cardData,index)=>{
-  const card=document.createElement("div");
-  card.className="card";
-  card.dataset.index=index;
-  card.innerHTML=`<div class="card-inner">
-    <div class="card-face card-front"><img src="${cardData.image}" alt=""></div>
-    <div class="card-face card-back">${cardData.text}</div>
-  </div>`;
-  card.addEventListener("click",()=>card.classList.toggle("flipped"));
-  board.appendChild(card);
-});
-
-// ============================
-// Leaderboard and colors.json
-// ============================
-const scores={};
-function getPoints(text){
-  const match=text.match(/\[(\d+)\]/);
-  return match?parseInt(match[1]):0;
-}
-function updateLeaderboard(){
-  teams.forEach(team=>scores[team.name]=0);
-  document.querySelectorAll(".card").forEach(card=>{
-    const color=card.dataset.color;
-    if(!color) return;
-    const team=teams.find(t=>t.color===color);
-    if(!team) return;
-    const points=getPoints(card.querySelector(".card-back").textContent);
-    scores[team.name]+=points;
-  });
-  // Sort leaderboard by highest points
-  const sortedTeams=[...teams].sort((a,b)=>scores[b.name]-scores[a.name]);
-  const boardEl=document.getElementById("leaderboard");
-  boardEl.innerHTML="<div style='margin-bottom:8px;font-size:16px;font-weight:bold;'>Leaderboard</div>";
-  const maxScore=Math.max(...teams.map(t=>scores[t.name]));
-  sortedTeams.forEach(team=>{
-    const div=document.createElement("div");
-    div.textContent=`${team.name}: ${scores[team.name]} pts`;
-    div.style.color=team.color;
-    div.style.fontWeight="bold";
-    if(scores[team.name]===maxScore && maxScore>0) div.classList.add("pulse");
-    boardEl.appendChild(div);
-  });
-}
-
-updateLeaderboard();
-
-fetch("colors.json")
-  .then(res=>{if(!res.ok) throw new Error("Failed to load colors.json"); return res.json();})
-  .then(data=>{
-    data.forEach(tile=>{
-      const card=board.children[tile.id-1];
-      const color=tile.color;
-      card.dataset.color=color;
-      card.querySelectorAll(".card-face").forEach(face=>face.style.background=color||"rgba(30,30,30,0.65)");
-      card.querySelector(".card-back").style.color=color?"black":"white";
+  teams.forEach(team => {
+    const teamEl = document.createElement("div");
+    teamEl.className = "team";
+    teamEl.innerHTML = `
+      <div class="swatch" style="background:${team.color}"></div>
+      <img src="${team.icon}" width="20" height="20">
+      <span>${team.name}</span>
+    `;
+    teamEl.addEventListener("click", () => {
+      if (selectedTeam === team) {
+        selectedTeam = null;
+        teamEl.classList.remove("selected");
+        clearHighlights();
+      } else {
+        document.querySelectorAll(".team").forEach(t => t.classList.remove("selected"));
+        teamEl.classList.add("selected");
+        selectedTeam = team;
+        highlightTeamTiles(team.color);
+      }
     });
-    updateLeaderboard();
-  })
-  .catch(err=>console.warn("colors.json not loaded:",err));
+    legend.appendChild(teamEl);
+  });
 
-// ============================
-// Countdown Timer
-// ============================
-const countdownEl=document.getElementById("countdown");
-const targetDate=new Date("January 22, 2026 17:00:00").getTime();
-function updateCountdown(){
-  const now=new Date().getTime();
-  const diff=targetDate-now;
-  if(diff<=0){ countdownEl.textContent="Time's up!"; return; }
-  const days=Math.floor(diff/(1000*60*60*24));
-  const hours=Math.floor((diff/(1000*60*60))%24);
-  const minutes=Math.floor((diff/(1000*60))%60);
-  const seconds=Math.floor((diff/1000)%60);
-  countdownEl.textContent=`⏳ ${days}d ${hours}h ${minutes}m ${seconds}s remaining until Bingo starts!`;
-}
-updateCountdown();
-setInterval(updateCountdown,1000);
+  function highlightTeamTiles(color) {
+    document.querySelectorAll(".card").forEach(card => {
+      if (card.dataset.color === color) card.classList.add("highlight");
+      else card.classList.remove("highlight");
+    });
+  }
+  function clearHighlights() {
+    document.querySelectorAll(".card").forEach(card => card.classList.remove("highlight"));
+  }
+
+  // ============================
+  // Build board
+  // ============================
+  const board = document.getElementById("board");
+
+  cardsData.forEach((cardData, index) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.index = index;
+
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-front"><img src="${cardData.image}" alt=""></div>
+        <div class="card-face card-back">${cardData.text}</div>
+      </div>
+    `;
+
+    card.addEventListener("click", () => card.classList.toggle("flipped"));
+    board.appendChild(card);
+  });
+
+  // ============================
+  // Leaderboard + colors.json
+  // ============================
+  const scores = {};
+
+  function getPoints(text) {
+    const match = text.match(/\[(\d+)\]/);
+    return match ? parseInt(match[1]) : 0;
+  }
+
+  function updateLeaderboard() {
+    teams.forEach(team => scores[team.name] = 0);
+
+    document.querySelectorAll(".card").forEach(card => {
+      const color = card.dataset.color;
+      if (!color) return;
+
+      const team = teams.find(t => t.color === color);
+      if (!team) return;
+
+      const points = getPoints(card.querySelector(".card-back").textContent);
+      scores[team.name] += points;
+    });
+
+    const sortedTeams = [...teams].sort((a, b) => scores[b.name] - scores[a.name]);
+    const lb = document.getElementById("leaderboard");
+
+    lb.innerHTML = "<div style='margin-bottom:8px;font-size:16px;font-weight:bold;'>Leaderboard</div>";
+
+    const maxScore = Math.max(...teams.map(t => scores[t.name]));
+    sortedTeams.forEach(team => {
+      const div = document.createElement("div");
+      div.textContent = `${team.name}: ${scores[team.name]} pts`;
+      div.style.color = team.color;
+
+      if (scores[team.name] === maxScore && maxScore > 0) div.classList.add("pulse");
+      lb.appendChild(div);
+    });
+  }
+
+  updateLeaderboard();
+
+  fetch("colors.json")
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to load colors.json");
+      return res.json();
+    })
+    .then(data => {
+      data.forEach(tile => {
+        const card = board.children[tile.id - 1];
+        const color = tile.color;
+
+        card.dataset.color = color || "";
+
+        card.querySelectorAll(".card-face").forEach(face => {
+          face.style.background = color || "rgba(30,30,30,0.65)";
+        });
+
+        card.querySelector(".card-back").style.color = color ? "black" : "white";
+      });
+
+      updateLeaderboard();
+    })
+    .catch(err => console.warn("colors.json not loaded:", err));
+
+  // ============================
+  // Countdown Timer
+  // ============================
+  const countdownEl = document.getElementById("countdown");
+  const targetDate = new Date("January 22, 2026 17:00:00").getTime();
+
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const diff = targetDate - now;
+
+    if (diff <= 0) {
+      countdownEl.textContent = "Time's up!";
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    countdownEl.textContent = `⏳ ${days}d ${hours}h ${minutes}m ${seconds}s remaining until Bingo starts!`;
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
 </script>
 
-<!-- ===== Footer ===== -->
 <div id="footer">
   Made with ❤️ by Sean for Kingdom
 </div>
