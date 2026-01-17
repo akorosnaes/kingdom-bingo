@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <title>Kingdom 2026 Bingo</title>
 <style>
+
+#countdown {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 12px 0;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+  
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -98,6 +108,8 @@ body {
 <body>
 
 <img id="banner" src="banner.jpg" alt="Banner Image" />
+
+<div id="countdown"></div>
 
 <!-- ===== Legend ===== -->
 <div id="legend"></div>
@@ -243,6 +255,38 @@ fetch("colors.json")
   })
   .catch(err => console.warn("colors.json not loaded (ok for local testing):", err));
 
+// ============================
+// Countdown Timer
+// ============================
+const countdownEl = document.getElementById("countdown");
+
+// Target: Thursday Jan 22 at 5pm local time
+const targetDate = new Date("January 22, 2026 17:00:00").getTime();
+
+function updateCountdown() {
+  const now = new Date().getTime();
+  const diff = targetDate - now;
+
+  if (diff <= 0) {
+    countdownEl.textContent = "Time's up!";
+    return;
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  countdownEl.textContent =
+    `⏳ ${days}d ${hours}h ${minutes}m ${seconds}s remaining until Bingo starts!`;
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+  
+  
+  
 </script>
 <!-- ===== Footer ===== -->
 <div id="footer">
@@ -251,6 +295,7 @@ fetch("colors.json")
   
 </body>
 </html>
+
 
 
 
