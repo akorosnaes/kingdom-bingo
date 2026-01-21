@@ -386,31 +386,51 @@
     })
     .catch(err => console.warn("colors.json not loaded:", err));
 
-  // ============================
-  // Countdown Timer
-  // ============================
-  const countdownEl = document.getElementById("countdown");
-  const targetDate = new Date("January 22, 2026 17:00:00").getTime();
+// ============================
+// Countdown Timer
+// ============================
+const countdownEl = document.getElementById("countdown");
 
-  function updateCountdown() {
-    const now = new Date().getTime();
-    const diff = targetDate - now;
+// Target time (Unix seconds → ms)
+const TARGET_TIMESTAMP = 1769122800 * 1000;
 
-    if (diff <= 0) {
-      countdownEl.textContent = "Time's up!";
-      return;
-    }
+// Offset between server time and local time
+let timeOffset = 0;
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
+// Fetch authoritative UTC time once
+fetch("https://worldtimeapi.org/api/timezone/Etc/UTC")
+  .then(res => res.json())
+  .then(data => {
+    // data.unixtime is in seconds
+    const serverNow = data.unixtime * 1000;
+    timeOffset = serverNow - Date.now();
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  })
+  .catch(err => {
+    console.warn("Time sync failed, falling back to local clock", err);
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  });
 
-    countdownEl.textContent = `⏳ ${days}d ${hours}h ${minutes}m ${seconds}s remaining until Bingo starts!`;
+function updateCountdown() {
+  const now = Date.now() + timeOffset;
+  const diff = TARGET_TIMESTAMP - now;
+
+  if (diff <= 0) {
+    countdownEl.textContent = "Bingo Time!";
+    return;
   }
 
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff / 3600000) % 24);
+  const minutes = Math.floor((diff / 60000) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  countdownEl.textContent =
+    `⏳ ${days}d ${hours}h ${minutes}m ${seconds}s remaining until Bingo starts!`;
+}
+
 </script>
 
 <div id="footer">
@@ -422,3 +442,4 @@
 
 </body>
 </html>
+
