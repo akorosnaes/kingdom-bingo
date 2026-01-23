@@ -1,6 +1,6 @@
 [
   { "id": 1, "color": "" },
-  { "id": 2, "color": "" },
+  { "id": 2, "color": "#178C51" },
   { "id": 3, "color": "#6887CE" },
   { "id": 4, "color": "" },
   { "id": 5, "color": "" },
@@ -13,10 +13,10 @@
   { "id": 11, "color": "" },
   { "id": 12, "color": "#178C51" },
 
-  { "id": 13, "color": "" },
-  { "id": 14, "color": "" },
-  { "id": 15, "color": "" },
-  { "id": 16, "color": "" },
+  { "id": 13, "color": "#178C51" },
+  { "id": 14, "color": "#6887CE" },
+  { "id": 15, "color": "#F2AA24" },
+  { "id": 16, "color": "#F2AA24" },
   { "id": 17, "color": "" },
   { "id": 18, "color": "#F2AA24" },
 
@@ -38,9 +38,10 @@
   { "id": 32, "color": "" },
   { "id": 33, "color": "" },
   { "id": 34, "color": "" },
-  { "id": 35, "color": "" },
+  { "id": 35, "color": "#F2AA24" },
   { "id": 36, "color": "" }
 ]
+
 
 
 
