@@ -17,7 +17,7 @@
   { "id": 14, "color": "#6887CE" },
   { "id": 15, "color": "#F2AA24" },
   { "id": 16, "color": "#F2AA24" },
-  { "id": 17, "color": "" },
+  { "id": 17, "color": "#F2AA24" },
   { "id": 18, "color": "#F2AA24" },
 
   { "id": 19, "color": "" },
@@ -41,6 +41,7 @@
   { "id": 35, "color": "#F2AA24" },
   { "id": 36, "color": "" }
 ]
+
 
 
 
